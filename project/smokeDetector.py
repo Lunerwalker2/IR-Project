@@ -6,15 +6,15 @@ erodeElement = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
 dilateElement = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
 
 # Read image and convert to grayscale
-img = cv2.imread('images/forestfire4.jpeg')
+img = cv2.imread('images/forestfire3.jpg')
 img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 # Blur the image
 # cv2.GaussianBlur(img_gray, (7, 7), 0, dst=img_gray)
 
 # Specify an ROI in the frame (set in stone for now)
-x, y = 450, 120
-w, h = 200, 220
+x, y = 2, 400
+w, h = 200, 240
 ROI = img_gray[y:y+h, x:x+h]
 
 

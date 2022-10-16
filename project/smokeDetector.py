@@ -44,6 +44,7 @@ cv2.rectangle(img_gray, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
 show_image('Original Image', img)
 show_image('Grayed/Blurred Image', img)
+show_image('Morphed Image', img_morph)
 # show_image("Original Image", img)
 # show_image("Original Image", img)
 # show_image("Original Image", img)

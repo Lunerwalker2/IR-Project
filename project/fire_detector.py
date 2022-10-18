@@ -35,11 +35,17 @@ cv2.rectangle(img_gray, (x, y), (x + w, y + h), (0, 255, 0), 2)
 # Just based on difference between smoke and none smoke for now
 
 # Get a list of the sliced mats of the image to go over
-list_of_regions = smoke_scanner.split_into_lines(img_noised, 5, 11)
+list_of_regions = smoke_scanner.split_into_lines(img_noised, 6, 13)
 
 # Show all the regions
-for x in range(len(list_of_regions)):
-    show_image(f"Region {x}", list_of_regions[x], False)
+# for x in range(len(list_of_regions)):
+#     show_image(f"Region {x}", list_of_regions[x], False)
+
+edges_list = smoke_scanner.find_smoke_edges(list_of_regions)
+
+# Show all the edges
+for x in range(len(edges_list)):
+    show_image(f"Edges {x}", edges_list[x], False)
 
 ######
 

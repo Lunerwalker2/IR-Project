@@ -27,7 +27,6 @@ def split_into_lines(normalized_img, num_lines, pixel_width):
     last_y_pos = 0
     # Fill with the y positions of each line
     for y in range(num_lines):
-
         # Top left corner
         pt1 = (0, last_y_pos)
         print(pt1)
@@ -43,3 +42,14 @@ def split_into_lines(normalized_img, num_lines, pixel_width):
 
     return horizontal_scans
 
+
+def find_smoke_edges(slice_list):
+    # Create a list to hold the edge result
+    edge_list = []
+
+    # Go through each slice and find the edges
+    for region in slice_list:
+        edge_list.append(cv2.Canny(region, 80, 200, L2gradient=True))
+
+
+    return edge_list

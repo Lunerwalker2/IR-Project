@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from horizontal_slice import HorizontalSlice
 
 
 # The basic idea is to have a few lines scanning through the image and try to find
@@ -35,7 +36,7 @@ def split_into_lines(normalized_img, num_lines, pixel_width):
         pt2 = (normalized_img.shape[1], int(last_y_pos + ((pixel_width - 1) / 2)))
         print(pt2)
 
-        region = normalized_img[pt1[1]:pt2[1], pt1[0]:pt2[0]]
+        region = HorizontalSlice(pt1, pt2, normalized_img)
         # Section off the region to add
         horizontal_scans.append(region)
         last_y_pos += distance_between_lines
@@ -49,7 +50,9 @@ def find_smoke_edges(slice_list):
 
     # Go through each slice and find the edges
     for region in slice_list:
-        edge_list.append(cv2.Canny(region, 80, 200, L2gradient=True))
-
+        edge_list.append(cv2.Canny(region.region, 80, 200, L2gradient=True))
 
     return edge_list
+
+def measure_side_colors():
+    pass

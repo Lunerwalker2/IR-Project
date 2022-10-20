@@ -50,7 +50,7 @@ def find_smoke_edges(slice_list):
 
     # Go through each slice and find the edges
     for region in slice_list:
-        edge_list.append(cv2.Canny(region.region, 80, 200, L2gradient=True))
+        edge_list.append(cv2.Canny(region.gray_region, 80, 200, L2gradient=True))
 
     return edge_list
 

@@ -45,14 +45,22 @@ def split_into_lines(normalized_img, num_lines, pixel_width):
 
 
 def find_smoke_edges(slice_list):
-    # Create a list to hold the edge result
-    edge_list = []
-
     # Go through each slice and find the edges
     for region in slice_list:
-        edge_list.append(cv2.Canny(region.gray_region, 80, 200, L2gradient=True))
+        region.edge_image = cv2.Canny(region.gray_image, 80, 200, L2gradient=True)
 
-    return edge_list
 
-def measure_side_colors():
-    pass
+# Throw out strips with no edges in them
+def prune_edges(slice_list):
+    # New list
+    pruned_list = []
+
+    length = len(slice_list)
+    # Check the mean of each region to see if its above 0
+    for x in range(length):
+        mean = np.average(slice_list[x].edge_image)
+        if mean != 0.0:
+            pruned_list.append(slice_list[x])
+
+    return pruned_list
+

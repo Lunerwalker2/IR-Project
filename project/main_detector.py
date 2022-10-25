@@ -38,14 +38,20 @@ cv2.rectangle(img_gray, (x, y), (x + w, y + h), (0, 255, 0), 2)
 list_of_regions = smoke_scanner.split_into_lines(img_noised, 6, 13)
 
 # Show all the regions
-for x in range(len(list_of_regions)):
-    show_image(f"Region {x}", list_of_regions[x].gray_region, False)
+# for x in range(len(list_of_regions)):
+#     show_image(f"Region {x}", list_of_regions[x].gray_region, False)
 
-edges_list = smoke_scanner.find_smoke_edges(list_of_regions)
+smoke_scanner.find_smoke_edges(list_of_regions)
 
 # Show all the edges
-# for x in range(len(edges_list)):
-#     show_image(f"Edges {x}", edges_list[x], False)
+# for x in range(len(list_of_regions)):
+#     show_image(f"Edges {x}", list_of_regions[x].edge_image, False)
+
+list_of_regions = smoke_scanner.prune_edges(list_of_regions)
+
+# Show the slices with edges
+for x in range(len(list_of_regions)):
+    show_image(f"Only With Edges {x}", list_of_regions[x].edge_image, False)
 
 ######
 

@@ -37,4 +37,3 @@ def denoise(image):
 
     # de-noise the image to wipe out any random bits of stuff
     return cv2.fastNlMeansDenoising(img_blurred, None, 12, 7, 21)
-

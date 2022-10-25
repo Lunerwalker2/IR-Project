@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # read the image and convert to hsv
-img = cv2.imread('images/forestfire.jpg')
+img = cv2.imread('../images/forestfire.jpg')
 img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
 # Display original image

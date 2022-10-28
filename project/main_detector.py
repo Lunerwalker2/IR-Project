@@ -41,17 +41,33 @@ list_of_regions = smoke_scanner.split_into_lines(img_noised, 6, 13)
 # for x in range(len(list_of_regions)):
 #     show_image(f"Region {x}", list_of_regions[x].gray_region, False)
 
+# Find edges in the slices
 smoke_scanner.find_smoke_edges(list_of_regions)
 
 # Show all the edges
 # for x in range(len(list_of_regions)):
 #     show_image(f"Edges {x}", list_of_regions[x].edge_image, False)
 
+# Remove slices without edges
 list_of_regions = smoke_scanner.prune_edges(list_of_regions)
 
 # Show the slices with edges
+# for x in range(len(list_of_regions)):
+#     show_image(f"Only With Edges {x}", list_of_regions[x].edge_image, False)
+
+img_blurred = cv2.GaussianBlur(img, (3, 3), 0)
+
+# Store the color version of the slices
 for x in range(len(list_of_regions)):
-    show_image(f"Only With Edges {x}", list_of_regions[x].edge_image, False)
+    region = list_of_regions[x]
+    region.color_image = smoke_detector.denoise(img_blurred[region.pt1[1]:region.pt2[1], region.pt1[0]:region.pt2[0]])
+
+# Show the slices with edges
+# for x in range(len(list_of_regions)):
+#     show_image(f"Recolorized slices {x}", list_of_regions[x].color_image, False)
+
+vertical_average_slices = smoke_scanner.average_columns(list_of_regions)
+
 
 ######
 

@@ -64,3 +64,19 @@ def prune_edges(slice_list):
 
     return pruned_list
 
+
+# Average the vertical columns of gray pixels into a 1D array of values for each slice
+def average_columns(slice_list):
+    averaged_slices = []
+
+    for region in slice_list:
+        columns = np.hsplit(region.gray_image, region.gray_image.shape[1])
+        values_list = []
+        for column in columns:
+            # Use the first element of the 4 channel scalar for gray
+            average_value = cv2.mean(column)[0]
+            values_list.append(average_value)
+        averaged_slices.append(values_list)
+
+    print(np.shape(averaged_slices))
+    return averaged_slices

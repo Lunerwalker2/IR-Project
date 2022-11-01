@@ -67,16 +67,22 @@ def prune_edges(slice_list):
 
 # Average the vertical columns of gray pixels into a 1D array of values for each slice
 def average_columns(slice_list):
-    averaged_slices = []
-
     for region in slice_list:
         columns = np.hsplit(region.gray_image, region.gray_image.shape[1])
-        values_list = []
         for column in columns:
             # Use the first element of the 4 channel scalar for gray
             average_value = cv2.mean(column)[0]
-            values_list.append(average_value)
-        averaged_slices.append(values_list)
+            region.vertical_average_list.append(average_value)
 
-    print(np.shape(averaged_slices))
-    return averaged_slices
+
+def find_edges(slice_list):
+    for region in slice_list:
+        last_result_black = False
+        for x in range(len(region.vertical_average_list)):
+            print(region.vertical_average_list[x])
+            if region.vertical_average_list[x] > 200:
+                if last_result_black: region.edge_x_locations.append(x)
+                last_result_black = False
+            elif region.vertical_average_list[x] < 50:
+                if not last_result_black: region.edge_x_locations.append(x)
+                last_result_black = True

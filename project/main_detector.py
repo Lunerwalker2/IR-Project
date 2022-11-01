@@ -66,7 +66,24 @@ for x in range(len(list_of_regions)):
 # for x in range(len(list_of_regions)):
 #     show_image(f"Recolorized slices {x}", list_of_regions[x].color_image, False)
 
-vertical_average_slices = smoke_scanner.average_columns(list_of_regions)
+smoke_scanner.average_columns(list_of_regions)
+
+smoke_scanner.find_edges(list_of_regions)
+
+for region in list_of_regions:
+    print(region.edge_x_locations)
+    copy = region.gray_image.copy()
+    # if region.edge_x_locations[0] == 0 and len(region.edge_x_locations) == 1:
+    #     list_of_regions.remove(region)
+    for x in range(len(region.edge_x_locations)):
+        cv2.line(copy, (region.edge_x_locations[x], 0),
+                 (region.edge_x_locations[x], region.pt2[1]), (200, 0, 0), 4)
+    show_image(f"edges drawn {x}", copy, False)
+
+for x in range(len(list_of_regions)):
+    locations = list_of_regions[x].edge_x_locations
+    if len(locations) == 1 and locations[0] == 0:
+        list_of_regions.pop(x)
 
 
 ######

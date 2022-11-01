@@ -9,3 +9,6 @@ class HorizontalSlice:
         self.edge_image = np.zeros(np.shape(self.gray_image))
         self.color_image = np.zeros(np.shape(self.gray_image))
 
+        self.vertical_average_list = []
+        self.edge_x_locations = []
+

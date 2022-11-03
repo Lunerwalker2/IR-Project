@@ -78,7 +78,7 @@ for region in list_of_regions:
     for x in range(len(region.edge_x_locations)):
         cv2.line(copy, (region.edge_x_locations[x], 0),
                  (region.edge_x_locations[x], region.pt2[1]), (200, 0, 0), 4)
-    show_image(f"edges drawn {x}", copy, False)
+    show_image(f"Edges drawn {x}", copy, False)
 
 for x in range(len(list_of_regions)):
     locations = list_of_regions[x].edge_x_locations

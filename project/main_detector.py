@@ -55,12 +55,14 @@ list_of_regions = smoke_scanner.prune_edges(list_of_regions)
 # for x in range(len(list_of_regions)):
 #     show_image(f"Only With Edges {x}", list_of_regions[x].edge_image, False)
 
-img_blurred = cv2.GaussianBlur(img, (3, 3), 0)
-
 # Store the color version of the slices
+img_color_blurred = smoke_detector.denoise_color(img)
+
 for x in range(len(list_of_regions)):
     region = list_of_regions[x]
-    region.color_image = smoke_detector.denoise(img_blurred[region.pt1[1]:region.pt2[1], region.pt1[0]:region.pt2[0]])
+    # print(region.color_image.shape)
+    region.color_image = img_color_blurred[region.pt1[1]:region.pt2[1], region.pt1[0]:region.pt2[0]]
+    # print(region.color_image.shape)
 
 # Show the slices with edges
 # for x in range(len(list_of_regions)):
@@ -70,20 +72,30 @@ smoke_scanner.average_columns(list_of_regions)
 
 smoke_scanner.find_edges(list_of_regions)
 
-for region in list_of_regions:
-    print(region.edge_x_locations)
-    copy = region.gray_image.copy()
-    # if region.edge_x_locations[0] == 0 and len(region.edge_x_locations) == 1:
-    #     list_of_regions.remove(region)
-    for x in range(len(region.edge_x_locations)):
-        cv2.line(copy, (region.edge_x_locations[x], 0),
-                 (region.edge_x_locations[x], region.pt2[1]), (200, 0, 0), 4)
-    show_image(f"Edges drawn {x}", copy, False)
-
+# Toss out any slices without edges
 for x in range(len(list_of_regions)):
     locations = list_of_regions[x].edge_x_locations
     if len(locations) == 1 and locations[0] == 0:
         list_of_regions.pop(x)
+        x += 1
+
+# Draw the lines on the slices and show them
+for region in list_of_regions:
+    # print(region.edge_x_locations)
+    copy = region.color_image.copy()
+    for x in range(len(region.edge_x_locations)):
+        cv2.line(copy, (region.edge_x_locations[x], 0),
+                 (region.edge_x_locations[x], region.pt2[1]), (10, 250, 10), 4)
+    show_image(f"edges drawn {x}", copy, False)
+
+
+smoke_scanner.sample_middle(list_of_regions)
+
+
+for region in list_of_regions:
+    print(region.center_point_colors)
+
+
 
 
 ######

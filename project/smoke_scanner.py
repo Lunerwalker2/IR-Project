@@ -18,23 +18,24 @@ def split_into_lines(normalized_img, num_lines, pixel_width):
 
     # Find the distance between each line
     distance_between_lines = int(total_height / num_lines)
-    print(distance_between_lines)
+    # print(distance_between_lines)
 
     # Create a list for the scanned regions
     horizontal_scans = []
 
-    print(normalized_img.shape)
+    # print(normalized_img.shape)
 
     last_y_pos = 0
     # Fill with the y positions of each line
     for y in range(num_lines):
         # Top left corner
         pt1 = (0, last_y_pos)
-        print(pt1)
+        # print(pt1)
 
         # Bottom right corner
-        pt2 = (normalized_img.shape[1], int(last_y_pos + ((pixel_width - 1) / 2)))
-        print(pt2)
+        # pt2 = (normalized_img.shape[1], int(last_y_pos + ((pixel_width - 1) / 2)))
+        pt2 = (normalized_img.shape[1], last_y_pos + pixel_width)
+        # print(pt2)
 
         region = HorizontalSlice(pt1, pt2, normalized_img)
         # Section off the region to add
@@ -69,20 +70,51 @@ def prune_edges(slice_list):
 def average_columns(slice_list):
     for region in slice_list:
         columns = np.hsplit(region.gray_image, region.gray_image.shape[1])
+
         for column in columns:
             # Use the first element of the 4 channel scalar for gray
             average_value = cv2.mean(column)[0]
             region.vertical_average_list.append(average_value)
 
 
+# Mark locations of sudden color change
 def find_edges(slice_list):
     for region in slice_list:
         last_result_black = False
+
         for x in range(len(region.vertical_average_list)):
-            print(region.vertical_average_list[x])
+            # print(region.vertical_average_list[x])
+
             if region.vertical_average_list[x] > 200:
                 if last_result_black: region.edge_x_locations.append(x)
                 last_result_black = False
+
             elif region.vertical_average_list[x] < 50:
                 if not last_result_black: region.edge_x_locations.append(x)
                 last_result_black = True
+
+
+# Give the average color of the center points in the colorized slice between edges
+def sample_middle(slice_list):
+    for region in slice_list:
+
+        # If the first value isn't 0, add it
+        if not region.edge_x_locations[0] == 0:
+            region.edge_x_locations.insert(0, 0)
+
+        # If the first value isn't the end of the frame, add it
+        if not region.edge_x_locations[-1] == region.gray_image.shape[1]:
+            region.edge_x_locations.append(region.gray_image.shape[1])
+
+        # Find the colors at the center of each area marked by the edges
+        for x in range(len(region.edge_x_locations) - 1):
+            # Find the middle between two edges
+            center_point = int((region.edge_x_locations[x] + region.edge_x_locations[x + 1]) / 2)
+
+            # if x == 0:
+            #     print(region.color_image[:, center_point])
+            # print(np.average(region.color_image[:, center_point], axis=0))
+
+            # Average the color in that column and store it
+            region.center_point_colors.append(np.average(region.color_image[:, center_point], axis=0))
+

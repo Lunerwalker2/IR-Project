@@ -7,8 +7,8 @@ class HorizontalSlice:
 
         self.gray_image = img[pt1[1]:pt2[1], pt1[0]:pt2[0]]
         self.edge_image = np.zeros(np.shape(self.gray_image))
-        self.color_image = np.zeros(np.shape(self.gray_image))
+        self.color_image = np.zeros(self.gray_image.shape + (3,))
 
         self.vertical_average_list = []
         self.edge_x_locations = []
-
+        self.center_point_colors = []

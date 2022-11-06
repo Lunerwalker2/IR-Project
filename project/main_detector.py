@@ -91,16 +91,15 @@ for region in list_of_regions:
 
 smoke_scanner.sample_middle(list_of_regions)
 
-
-for region in list_of_regions:
-    print(region.center_point_colors)
-
+for x in range(len(list_of_regions)):
+    print(list_of_regions[x].center_point_colors)
+    show_image(f"cb of {x}", cv2.extractChannel(cv2.cvtColor(list_of_regions[x].color_image, cv2.COLOR_BGR2YCrCb), 2), False)
 
 
 
 ######
 
-# show_image('Original Image', img)
+show_image('Original Image', img)
 # show_image('Grayed/Blurred Image', img_gray)
 # show_image('Morphed Image', img_morph)
 show_image('De-Noised Image', img_noised)

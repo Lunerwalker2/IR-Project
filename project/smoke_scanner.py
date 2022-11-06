@@ -112,9 +112,12 @@ def sample_middle(slice_list):
             center_point = int((region.edge_x_locations[x] + region.edge_x_locations[x + 1]) / 2)
 
             # if x == 0:
-            #     print(region.color_image[:, center_point])
+            #     print(region.color_image.shape)
             # print(np.average(region.color_image[:, center_point], axis=0))
 
+            # Convert to YCrCb
+            ycrcb_image = cv2.cvtColor(region.color_image, cv2.COLOR_BGR2YCrCb)
+
             # Average the color in that column and store it
-            region.center_point_colors.append(np.average(region.color_image[:, center_point], axis=0))
+            region.center_point_colors.append(np.average(ycrcb_image[:, center_point], axis=0))
 

@@ -44,4 +44,5 @@ def denoise_color(image):
     img_blurred = cv2.GaussianBlur(image, (5, 5), 0)
 
     # de-noise the image to wipe out any random bits of stuff
-    return cv2.fastNlMeansDenoisingColored(img_blurred, None, 12, 7, 21)
+    # return cv2.fastNlMeansDenoisingColored(img_blurred, None, 10, 7, 20)
+    return img_blurred

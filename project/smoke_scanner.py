@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from horizontal_slice import HorizontalSlice
+import math
 
 
 # The basic idea is to have a few lines scanning through the image and try to find
@@ -116,8 +117,41 @@ def sample_middle(slice_list):
             # print(np.average(region.color_image[:, center_point], axis=0))
 
             # Convert to YCrCb
-            ycrcb_image = cv2.cvtColor(region.color_image, cv2.COLOR_BGR2YCrCb)
+            # ycrcb_image = cv2.cvtColor(region.color_image, cv2.COLOR_BGR2YCrCb)
 
             # Average the color in that column and store it
-            region.center_point_colors.append(np.average(ycrcb_image[:, center_point], axis=0))
+            region.center_point_colors.append(np.average(region.color_image[:, center_point], axis=0))
+
+
+def bgr_to_hsl(bgr_scalar):
+
+    H, S, L = 0.0, 0.0, 0.0
+
+    # Normalize to 0-1
+    b = bgr_scalar[0]
+    g = bgr_scalar[1]
+    r = bgr_scalar[2]
+
+    c_max = max(r, g, b)
+    c_min = min(r, g, b)
+
+    delta = (c_max - c_min)/255
+
+    L = (0.5 * (c_max + c_min)) / 255
+
+    if L > 0.0:
+        S = delta / (1 - abs((2 * L) - 1))
+    else:
+        S = 0.0
+
+    top = r - (0.5 * g) - (0.5 * b)
+    root = math.sqrt(math.pow(r, 2) + math.pow(g, 2) + math.pow(b, 2) - r * g - r * b - g * b)
+
+    if g >= b:
+        H = math.degrees(math.acos(top/root))
+    else:
+        H = 360 - math.degrees(math.acos(top/root))
+
+    return np.array(H, S, L)
+
 

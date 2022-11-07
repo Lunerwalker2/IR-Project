@@ -26,10 +26,6 @@ img_morph = smoke_detector.normalize_image(img_gray, 0.75, (x, y), (w, h))
 # De-noise the image
 img_noised = smoke_detector.denoise(img_morph)
 
-# Draw a rectangle to indicate the ROI area
-cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 0), 2)
-cv2.rectangle(img_gray, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
 ######
 # Scanning
 # Just based on difference between smoke and none smoke for now
@@ -88,16 +84,37 @@ for region in list_of_regions:
                  (region.edge_x_locations[x], region.pt2[1]), (10, 250, 10), 4)
     show_image(f"edges drawn {x}", copy, False)
 
-
+# Find the RGB color of each centerpoint
 smoke_scanner.sample_middle(list_of_regions)
 
+# Show the color images
 for x in range(len(list_of_regions)):
     print(list_of_regions[x].center_point_colors)
-    show_image(f"cb of {x}", cv2.extractChannel(cv2.cvtColor(list_of_regions[x].color_image, cv2.COLOR_BGR2YCrCb), 2), False)
+
+    show_image(f"cb of {x}", list_of_regions[x].color_image, False)
+
+
+
+
+############
+
+# Analyze the colors
+for x in range(len(list_of_regions)):
+    region = list_of_regions[x]
+
+    #convert to hsl and do smth ig
+
+
+
+#
 
 
 
 ######
+
+# Draw a rectangle to indicate the ROI area
+cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 0), 2)
+cv2.rectangle(img_gray, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
 show_image('Original Image', img)
 # show_image('Grayed/Blurred Image', img_gray)

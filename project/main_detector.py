@@ -88,22 +88,38 @@ for region in list_of_regions:
 smoke_scanner.sample_middle(list_of_regions)
 
 # Show the color images
-for x in range(len(list_of_regions)):
-    print(list_of_regions[x].center_point_colors)
+# for x in range(len(list_of_regions)):
+#     print(list_of_regions[x].center_point_colors)
 
-    show_image(f"cb of {x}", list_of_regions[x].color_image, False)
+    # show_image(f"cb of {x}", list_of_regions[x].color_image, False)
 
 
 
 
 ############
 
+not_sky_list = []
+
 # Analyze the colors
 for x in range(len(list_of_regions)):
     region = list_of_regions[x]
 
+    smoke_not_detected = True
     #convert to hsl and do smth ig
+    for y in range(len(region.center_point_colors)):
+        hsl_color = smoke_scanner.bgr_to_hsl(region.center_point_colors[y])
 
+        if hsl_color[0] > 180 and hsl_color[0] < 260:
+            # print(hsl_color[2])
+            if hsl_color[2] > 0.7:
+                print(hsl_color)
+                smoke_not_detected = False
+    if smoke_not_detected:
+        not_sky_list.append(list_of_regions[x])
+
+
+for x in range(len(not_sky_list)):
+    show_image(f"new thing {x}", not_sky_list[x].color_image, False)
 
 
 #

@@ -124,7 +124,6 @@ def sample_middle(slice_list):
 
 
 def bgr_to_hsl(bgr_scalar):
-
     H, S, L = 0.0, 0.0, 0.0
 
     # Normalize to 0-1
@@ -135,7 +134,7 @@ def bgr_to_hsl(bgr_scalar):
     c_max = max(r, g, b)
     c_min = min(r, g, b)
 
-    delta = (c_max - c_min)/255
+    delta = (c_max - c_min) / 255
 
     L = (0.5 * (c_max + c_min)) / 255
 
@@ -148,10 +147,11 @@ def bgr_to_hsl(bgr_scalar):
     root = math.sqrt(math.pow(r, 2) + math.pow(g, 2) + math.pow(b, 2) - r * g - r * b - g * b)
 
     if g >= b:
-        H = math.degrees(math.acos(top/root))
+        H = math.degrees(math.acos(top / root))
     else:
-        H = 360 - math.degrees(math.acos(top/root))
+        H = 360 - math.degrees(math.acos(top / root))
 
-    return np.array(H, S, L)
+    if math.isnan(H):
+        H = 0
 
-
+    return np.array((H, S, L))

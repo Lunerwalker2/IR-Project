@@ -78,13 +78,13 @@ for x in range(len(list_of_regions)):
         x += 1
 
 # Draw the lines on the slices and show them
-for x in range(len(list_of_regions)):
-    # print(region.edge_x_locations)
-    copy = list_of_regions[x].color_image.copy()
-    for y in range(len(list_of_regions[x].edge_x_locations)):
-        cv2.line(copy, (list_of_regions[x].edge_x_locations[y], 0),
-                 (list_of_regions[x].edge_x_locations[y], list_of_regions[x].pt2[1]), (10, 250, 10), 4)
-    show_image(f"edges drawn {x}", copy, False)
+# for x in range(len(list_of_regions)):
+#     # print(region.edge_x_locations)
+#     copy = list_of_regions[x].color_image.copy()
+#     for y in range(len(list_of_regions[x].edge_x_locations)):
+#         cv2.line(copy, (list_of_regions[x].edge_x_locations[y], 0),
+#                  (list_of_regions[x].edge_x_locations[y], list_of_regions[x].pt2[1]), (10, 250, 10), 4)
+#     show_image(f"edges drawn {x}", copy, False)
 
 # Find the RGB color of each centerpoint
 smoke_scanner.sample_middle(list_of_regions)
@@ -93,9 +93,7 @@ smoke_scanner.sample_middle(list_of_regions)
 # for x in range(len(list_of_regions)):
 #     print(list_of_regions[x].center_point_colors)
 
-    # show_image(f"cb of {x}", list_of_regions[x].color_image, False)
-
-
+# show_image(f"cb of {x}", list_of_regions[x].color_image, False)
 
 
 ############
@@ -106,48 +104,90 @@ not_sky_list = list_of_regions.copy()
 for x in range(len(list_of_regions)):
     region = list_of_regions[x]
 
-    sky = False
+    take_out = False
 
-    previous_blue = False
     previous_white = False
-    #convert to hsl and do smth ig
+    previous_other = False
+
+    # convert to hsl and do smth ig
     for y in range(len(region.center_point_colors)):
         hsl_color = smoke_scanner.bgr_to_hsl(region.center_point_colors[y])
         hsl_color = hsl_color.round(3)
 
         # if blue
         if 200 < hsl_color[0] < 240:
-            print(hsl_color, x)
 
             # If it's a strong blue, assume sky
             if hsl_color[1] > 0.7:
-                sky = True
+                print("blue", hsl_color, x)
+                take_out = True
+                break
+            # Smoke??????
+            if hsl_color[2] > 0.6:
+                print("smoke????", hsl_color, x)
+
+                # DING DING DING DING DING DING DING DING
+                if previous_other:
+                    not_sky_list[x].slice_id = x
+                    not_sky_list[x].fire_detected = True
+                    not_sky_list[x].fire_edges = (
+                        region.center_point_locations[y - 1], region.center_point_locations[y]
+                    )
+                    break
+
+                # Mark the smoke for now
+                previous_white = True
+                previous_other = False
+
+        if 0 <= hsl_color[0] <= 200 or hsl_color[0] >= 240:
+            print("other", hsl_color, x)
+            # DING DING DING DING DING DING DING DING
+            if previous_white:
+                not_sky_list[x].slice_id = x
+                not_sky_list[x].fire_detected = True
+                not_sky_list[x].fire_edges = (
+                    region.center_point_locations[y - 1], region.center_point_locations[y]
+                )
                 break
 
+            previous_other = True
+            previous_white = False
 
-
-    if sky:
+    if take_out:
         not_sky_list.pop(x)
 
+# for x in range(len(not_sky_list)):
+#     show_image(f"new thing {x}", not_sky_list[x].color_image, False)
 
-for x in range(len(not_sky_list)):
-    show_image(f"new thing {x}", not_sky_list[x].color_image, False)
+# Check for fires
+for region in not_sky_list:
+    if region.fire_detected:
+        print("DING DING DING DING DING DING")
 
+        print(region.pt1, region.pt2, region.fire_edges, region.slice_id)
+        cv2.rectangle(img,
+                      (region.fire_edges[0], region.pt1[1] - 145),
+                      (region.fire_edges[1], region.pt2[1] - 145),
+                      (0, 0, 255),
+                      3
+                      )
+
+        # show_image("FIRE FIRE FIRE FIRE FIRE FIRE FIRE FIRE", img, False)
+        break
 
 #
-
 
 
 ######
 
 # Draw a rectangle to indicate the ROI area
-cv2.rectangle(img, (roi_x, roi_y), (roi_x + w, roi_y + h), (0, 0, 0), 2)
+# cv2.rectangle(img, (roi_x, roi_y), (roi_x + w, roi_y + h), (0, 0, 0), 2)
 # cv2.rectangle(img_gray, (roi_x, roi_y), (roi_x + w, roi_y + h), (0, 255, 0), 4)
 
 show_image('Original Image', img)
 # show_image('Contrast Image', cv2.multiply(img, (1.2, 1.2, 1.2, 1.2)))
 # show_image('Grayed/Blurred Image', img_gray)
 # show_image('Morphed Image', img_morph)
-show_image('De-Noised Image', img_noised)
+# show_image('De-Noised Image', img_noised)
 
 cv2.waitKey(0)

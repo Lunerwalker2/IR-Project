@@ -111,6 +111,7 @@ def sample_middle(slice_list):
         for x in range(len(region.edge_x_locations) - 1):
             # Find the middle between two edges
             center_point = int((region.edge_x_locations[x] + region.edge_x_locations[x + 1]) / 2)
+            region.center_point_locations.append(center_point)
 
             # if x == 0:
             #     print(region.color_image.shape)

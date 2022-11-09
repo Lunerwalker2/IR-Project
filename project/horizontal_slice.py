@@ -11,4 +11,10 @@ class HorizontalSlice:
 
         self.vertical_average_list = []
         self.edge_x_locations = []
+        self.center_point_locations = []
         self.center_point_colors = []
+
+        self.fire_detected = False
+        self.fire_edges = ()
+
+        self.slice_id = -1

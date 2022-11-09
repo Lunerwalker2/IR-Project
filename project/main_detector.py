@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+from cv2.mat_wrapper import Mat
+
 import smoke_detector
 import smoke_scanner
 
@@ -17,11 +19,11 @@ img = cv2.imread('images/forestfire3.jpg')
 img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 # Specify an ROI in the frame (middle 50% horizontally)
-x, y = 0, int(0.25 * img_gray.shape[0])
+roi_x, roi_y = 0, int(0.25 * img_gray.shape[0])
 w, h = img_gray.shape[1], int(0.5 * img_gray.shape[0])
 
 # Normalize the image
-img_morph = smoke_detector.normalize_image(img_gray, 0.75, (x, y), (w, h))
+img_morph = smoke_detector.normalize_image(img_gray, 0.75, (roi_x, roi_y), (w, h))
 
 # De-noise the image
 img_noised = smoke_detector.denoise(img_morph)
@@ -31,11 +33,11 @@ img_noised = smoke_detector.denoise(img_morph)
 # Just based on difference between smoke and none smoke for now
 
 # Get a list of the sliced mats of the image to go over
-list_of_regions = smoke_scanner.split_into_lines(img_noised, 6, 13)
+list_of_regions = smoke_scanner.split_into_lines(img_noised, 7, 13)
 
-# Show all the regions
+# # Show all the regions
 # for x in range(len(list_of_regions)):
-#     show_image(f"Region {x}", list_of_regions[x].gray_region, False)
+#     show_image(f"Region {x}", list_of_regions[x].gray_image, False)
 
 # Find edges in the slices
 smoke_scanner.find_smoke_edges(list_of_regions)
@@ -76,12 +78,12 @@ for x in range(len(list_of_regions)):
         x += 1
 
 # Draw the lines on the slices and show them
-for region in list_of_regions:
+for x in range(len(list_of_regions)):
     # print(region.edge_x_locations)
-    copy = region.color_image.copy()
-    for x in range(len(region.edge_x_locations)):
-        cv2.line(copy, (region.edge_x_locations[x], 0),
-                 (region.edge_x_locations[x], region.pt2[1]), (10, 250, 10), 4)
+    copy = list_of_regions[x].color_image.copy()
+    for y in range(len(list_of_regions[x].edge_x_locations)):
+        cv2.line(copy, (list_of_regions[x].edge_x_locations[y], 0),
+                 (list_of_regions[x].edge_x_locations[y], list_of_regions[x].pt2[1]), (10, 250, 10), 4)
     show_image(f"edges drawn {x}", copy, False)
 
 # Find the RGB color of each centerpoint
@@ -98,24 +100,34 @@ smoke_scanner.sample_middle(list_of_regions)
 
 ############
 
-not_sky_list = []
+not_sky_list = list_of_regions.copy()
 
-# Analyze the colors
+# Knock out any slices with significant blue that isn't just plain smoke i.e. sky
 for x in range(len(list_of_regions)):
     region = list_of_regions[x]
 
-    smoke_not_detected = True
+    sky = False
+
+    previous_blue = False
+    previous_white = False
     #convert to hsl and do smth ig
     for y in range(len(region.center_point_colors)):
         hsl_color = smoke_scanner.bgr_to_hsl(region.center_point_colors[y])
+        hsl_color = hsl_color.round(3)
 
-        if hsl_color[0] > 180 and hsl_color[0] < 260:
-            # print(hsl_color[2])
-            if hsl_color[2] > 0.7:
-                print(hsl_color)
-                smoke_not_detected = False
-    if smoke_not_detected:
-        not_sky_list.append(list_of_regions[x])
+        # if blue
+        if 200 < hsl_color[0] < 240:
+            print(hsl_color, x)
+
+            # If it's a strong blue, assume sky
+            if hsl_color[1] > 0.7:
+                sky = True
+                break
+
+
+
+    if sky:
+        not_sky_list.pop(x)
 
 
 for x in range(len(not_sky_list)):
@@ -129,10 +141,11 @@ for x in range(len(not_sky_list)):
 ######
 
 # Draw a rectangle to indicate the ROI area
-cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 0), 2)
-cv2.rectangle(img_gray, (x, y), (x + w, y + h), (0, 255, 0), 2)
+cv2.rectangle(img, (roi_x, roi_y), (roi_x + w, roi_y + h), (0, 0, 0), 2)
+# cv2.rectangle(img_gray, (roi_x, roi_y), (roi_x + w, roi_y + h), (0, 255, 0), 4)
 
 show_image('Original Image', img)
+# show_image('Contrast Image', cv2.multiply(img, (1.2, 1.2, 1.2, 1.2)))
 # show_image('Grayed/Blurred Image', img_gray)
 # show_image('Morphed Image', img_morph)
 show_image('De-Noised Image', img_noised)

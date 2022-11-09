@@ -119,8 +119,11 @@ def sample_middle(slice_list):
             # Convert to YCrCb
             # ycrcb_image = cv2.cvtColor(region.color_image, cv2.COLOR_BGR2YCrCb)
 
+            column = cv2.multiply(region.color_image[:, center_point], (1.2, 1.2, 1.2, 1.2))
+
             # Average the color in that column and store it
-            region.center_point_colors.append(np.average(region.color_image[:, center_point], axis=0))
+            # region.center_point_colors.append(np.average(region.color_image[:, center_point], axis=0))
+            region.center_point_colors.append(np.average(column, axis=0))
 
 
 def bgr_to_hsl(bgr_scalar):

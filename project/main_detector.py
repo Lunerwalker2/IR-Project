@@ -172,7 +172,7 @@ for region in not_sky_list:
                       3
                       )
 
-        # show_image("FIRE FIRE FIRE FIRE FIRE FIRE FIRE FIRE", img, False)
+        show_image("FIRE FIRE FIRE FIRE FIRE FIRE FIRE FIRE", img)
         break
 
 #
